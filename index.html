@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0a0d18">
+  <meta name="description" content="DOGANA RUSH: Porto Franco — run-and-gun arcade in pixel art ambientato nel Porto di Bari. Adele, Rocco e i funzionari della Dogana contro la burocrazia.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>DOGANA RUSH: Porto Franco — Arcade Bari</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="apple-touch-icon" href="assets/icona-touch.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+  <main id="stage" aria-label="DOGANA RUSH, gioco arcade ambientato a Bari">
+    <canvas id="game" width="640" height="360" aria-label="Schermata di gioco"></canvas>
+
+    <div id="fx-vignette" aria-hidden="true"></div>
+    <div id="fx-scanlines" aria-hidden="true"></div>
+    <div id="flash" aria-hidden="true"></div>
+
+    <header id="utility-bar">
+      <div class="utility-brand"><span class="dot"></span> DOGANA GAMES <span class="util-sep">/</span> <span class="util-muted">BARI · 2026</span> <span class="util-muted">v2.5.0</span></div>
+      <div class="utility-actions">
+        <button id="btn-audio" class="chip-btn" type="button" aria-pressed="true" aria-label="Disattiva audio">AUDIO ATTIVO</button>
+        <button id="btn-fullscreen" class="chip-btn" type="button" aria-label="Schermo intero">SCHERMO INTERO</button>
+      </div>
+    </header>
+
+    <!-- TITLE -->
+    <section id="screen-title" class="screen title-screen active" aria-labelledby="title-logo">
+      <div class="title-copy">
+        <div class="presents"><span>MAGICOPORTO</span> PRESENTA</div>
+        <h1 id="title-logo" class="logo" aria-label="Dogana Rush: Porto Franco">
+          <span class="logo-small">L'ULTIMA</span>
+          <span class="logo-word">DOGANA</span>
+          <span class="logo-rush">RUSH<span class="logo-bang">!</span></span>
+          <span class="logo-sub">PORTO FRANCO</span>
+        </h1>
+        <p class="title-kicker">BARI · MOLO SAN NICOLA · ORE 08:00</p>
+        <p class="title-blurb">Cinque funzionari. Un porto nel caos.<br>Un rossetto carico a piena potenza.</p>
+        <div id="difficulty-group" class="difficulty-group" role="group" aria-label="Difficoltà della missione" aria-describedby="difficulty-hint" data-value="normal">
+          <span class="difficulty-label" aria-hidden="true">DIFFICOLTÀ</span>
+          <div class="difficulty-options">
+            <button type="button" class="difficulty-btn" data-difficulty="easy" aria-pressed="false" aria-label="Difficoltà facile">FACILE</button>
+            <button type="button" class="difficulty-btn is-selected" data-difficulty="normal" aria-pressed="true" aria-label="Difficoltà normale">NORMALE</button>
+            <button type="button" class="difficulty-btn" data-difficulty="hard" aria-pressed="false" aria-label="Difficoltà difficile">DIFFICILE</button>
+          </div>
+          <span id="difficulty-hint" class="difficulty-hint">LA SCELTA VALE PER LA PROSSIMA PARTITA</span>
+        </div>
+        <div class="title-actions">
+          <button id="btn-start" class="arcade-btn primary" type="button"><span class="coin">▶</span> INSERISCI GETTONE</button>
+          <button id="btn-levels" class="arcade-btn" type="button" hidden>SCEGLI LIVELLO</button>
+          <button id="btn-how" class="arcade-btn" type="button">COME SI GIOCA</button>
+        </div>
+        <div class="title-foot">
+          <span class="blink">PREMI INVIO O CLICCA PER INIZIARE</span>
+          <span id="title-record" class="title-record">RECORD 000000</span>
+          <span class="rating-badge">PIXEL 32-BIT</span>
+        </div>
+      </div>
+      <div class="title-stamp" aria-hidden="true">
+        <div class="stamp-ring">
+          <span>DOGANA</span>
+          <strong>BARI</strong>
+          <span>PORTO FRANCO</span>
+        </div>
+      </div>
+      <div class="title-legal">Parodia arcade non ufficiale · Nessun funzionario è stato maltrattato · Make-up testato su Mecha</div>
+    </section>
+
+    <!-- SELECT -->
+    <section id="screen-select" class="screen select-screen" aria-labelledby="select-title">
+      <div class="select-head">
+        <div>
+          <div class="micro-label">REPARTO OPERATIVO · PORTO DI BARI</div>
+          <h2 id="select-title">SELEZIONA IL FUNZIONARIO</h2>
+        </div>
+        <div class="select-badge">5 UNITÀ<br><strong>3 IN ARRUOLAMENTO</strong></div>
+      </div>
+
+      <div class="roster" role="list">
+        <button class="fighter-card adele is-selected" type="button" data-char="adele" aria-label="Adele, Milf leggendaria, aspirante TikToker, selezionabile" aria-pressed="true">
+          <span class="card-number">01</span>
+          <span class="card-live">DISPONIBILE</span>
+          <span class="portrait-wrap"><img class="portrait" id="portrait-adele" src="assets/adele-portrait.png" alt="" aria-hidden="true" loading="eager" decoding="async"></span>
+          <span class="card-info">
+            <strong class="fighter-name">ADELE</strong>
+            <span class="fighter-role">Ufficio Protocollo</span>
+            <span class="fighter-tags" aria-hidden="true">
+              <span class="fighter-tag tag-milf">MILF LEGGENDARIA</span>
+              <span class="fighter-tag tag-tiktok">ASPIRANTE TIKTOKER</span>
+            </span>
+            <span class="mini-stats"><i style="--v:86%"></i><i style="--v:94%"></i><i style="--v:72%"></i></span>
+          </span>
+          <span class="select-mark">SELEZIONATA</span>
+        </button>
+
+        <button class="fighter-card rocco" type="button" data-char="rocco" aria-label="Rocco, selezionabile" aria-pressed="false">
+          <span class="card-number">02</span>
+          <span class="card-live">DISPONIBILE</span>
+          <span class="portrait-wrap"><img class="portrait" id="portrait-rocco" src="assets/rocco-portrait.png" alt="" aria-hidden="true" loading="eager" decoding="async"></span>
+          <span class="card-info">
+            <strong class="fighter-name">ROCCO</strong>
+            <span class="fighter-role">Assistente Doganale · ex Croce Rossa</span>
+            <span class="mini-stats"><i style="--v:72%"></i><i style="--v:78%"></i><i style="--v:92%"></i></span>
+          </span>
+          <span class="select-mark">SELEZIONATO</span>
+        </button>
+
+        <button class="fighter-card locked" type="button" data-char="libero" aria-label="Franco G., personaggio bloccato" aria-pressed="false">
+          <span class="card-number">03</span>
+          <span class="card-live">BLOCCATO</span>
+          <span class="portrait-wrap locked-art">
+            <img class="locked-portrait" src="assets/libero-portrait.png" alt="" aria-hidden="true">
+            <span class="question">?</span>
+            <span class="lock-label">ARRUOLAMENTO<br>IN CORSO</span>
+          </span>
+          <span class="card-info">
+            <strong class="fighter-name">FRANCO G.</strong>
+            <span class="fighter-role">?</span>
+          </span>
+          <span class="select-mark">PROSSIMAMENTE</span>
+        </button>
+
+        <button class="fighter-card locked" type="button" data-char="locked-04" aria-label="Personaggio bloccato" aria-pressed="false">
+          <span class="card-number">04</span>
+          <span class="card-live">BLOCCATO</span>
+          <span class="portrait-wrap locked-art">
+            <img class="locked-portrait" src="assets/pontrelli-portrait.png" alt="" aria-hidden="true">
+            <span class="question">?</span>
+            <span class="lock-label">ARRUOLAMENTO<br>IN CORSO</span>
+          </span>
+          <span class="card-info">
+            <strong class="fighter-name">??</strong>
+          </span>
+          <span class="select-mark">PROSSIMAMENTE</span>
+        </button>
+
+        <button class="fighter-card locked" type="button" data-char="locked-05" aria-label="Personaggio bloccato" aria-pressed="false">
+          <span class="card-number">05</span>
+          <span class="card-live">BLOCCATO</span>
+          <span class="portrait-wrap locked-art">
+            <img class="locked-portrait" src="assets/mimmo-portrait.png" alt="" aria-hidden="true">
+            <span class="question">?</span>
+            <span class="lock-label">ARRUOLAMENTO<br>IN CORSO</span>
+          </span>
+          <span class="card-info">
+            <strong class="fighter-name">??</strong>
+          </span>
+          <span class="select-mark">PROSSIMAMENTE</span>
+        </button>
+      </div>
+
+      <div class="select-bottom">
+        <div class="loadout" aria-label="Arsenale di Adele">
+          <div class="loadout-label">ARSENALE MAKE-UP <span>DI ADELE</span></div>
+          <div class="gear">
+            <div class="gear-item"><span class="gear-icon lipstick-icon"></span><div><strong>ROSSETTO</strong><small>Pistola laser fucsia</small></div></div>
+            <div class="gear-item"><span class="gear-icon mascara-icon"></span><div><strong>MASCARA</strong><small>Gatling inchiostro nero</small></div></div>
+            <div class="gear-item"><span class="gear-icon powder-icon"></span><div><strong>CIPRIA</strong><small>Granata accecante</small></div></div>
+          </div>
+        </div>
+        <div class="select-actions">
+          <button id="btn-back-title" class="arcade-btn small" type="button">INDIETRO</button>
+          <button id="btn-deploy" class="arcade-btn primary" type="button">SBARCA A BARI <span>→</span></button>
+        </div>
+      </div>
+      <div id="select-hint" class="select-hint">Adele: 700 follower, un filtro tramonto e il prossimo reel da girare. Unità 02: Rocco disponibile. Unità 03–05: fascicoli riservati (la carriera social è già satura).</div>
+    </section>
+
+    <!-- LEVEL SELECT -->
+    <section id="screen-levels" class="screen levels-screen" aria-labelledby="levels-title">
+      <div class="levels-card">
+        <div class="levels-head">
+          <div>
+            <div class="micro-label">ARCHIVIO PRATICHE · DOPO IL COMPLETAMENTO</div>
+            <h2 id="levels-title">SCEGLI IL LIVELLO</h2>
+          </div>
+          <button id="btn-levels-back" class="arcade-btn small" type="button">INDIETRO</button>
+        </div>
+        <p class="levels-copy">La pratica è chiusa: ora puoi riaprire qualsiasi fascicolo. Difficoltà e personaggio restano quelli attuali (<strong id="levels-character">ADELE</strong>).</p>
+        <div class="levels-grid" role="list" aria-label="Livelli disponibili">
+          <button class="level-card" type="button" data-level="0" role="listitem"><span class="level-num">01</span><strong>PORTO FRANCO</strong><small>Bari · Molo San Nicola</small></button>
+          <button class="level-card" type="button" data-level="1" role="listitem"><span class="level-num">02</span><strong>BARI VECCHIA</strong><small>Vicoli · Basilica</small></button>
+          <button class="level-card" type="button" data-level="2" role="listitem"><span class="level-num">03</span><strong>DIREZIONE</strong><small>Via Amendola · corridoio</small></button>
+          <button class="level-card" type="button" data-level="3" role="listitem"><span class="level-num">04</span><strong>ROMA</strong><small>Piazza Mastai · Cesare</small></button>
+          <button class="level-card" type="button" data-level="4" role="listitem"><span class="level-num">05</span><strong>EUROPA</strong><small>Bruxelles · Commissione</small></button>
+          <button class="level-card" type="button" data-level="5" role="listitem"><span class="level-num">06</span><strong>PESCARA</strong><small>Formazione · scontrini</small></button>
+          <button class="level-card" type="button" data-level="6" role="listitem"><span class="level-num">07</span><strong>PESCARA NIGHT</strong><small>Riviera · Fiat Tipo</small></button>
+          <button class="level-card" type="button" data-level="7" role="listitem"><span class="level-num">08</span><strong>SOGEI</strong><small>Incubo · ex CEO</small></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- BRIEFING -->
+    <section id="screen-briefing" class="screen briefing-screen" aria-labelledby="briefing-title">
+      <div class="briefing-card">
+        <div class="briefing-top">
+          <div><span class="micro-label">FASCICOLO OPERATIVO · ATTO UNICO</span><h2 id="briefing-title">MISSIONE BARI → SOGEI</h2></div>
+          <div class="briefing-side">
+            <div class="briefing-difficulty" id="briefing-difficulty">
+              <span class="briefing-difficulty-label">DIFFICOLTÀ</span>
+              <strong id="briefing-difficulty-value">NORMALE</strong>
+            </div>
+            <div class="briefing-code">PRATICA<br><strong>#BARI-SOGEI</strong></div>
+          </div>
+        </div>
+        <div class="briefing-map journey-map">
+          <div class="journey-line" aria-hidden="true"></div>
+          <ol class="journey-stops" aria-label="Tappe della pratica: Porto, Bari Vecchia, Direzione, Roma Piazza Mastai, Europa, Pescara, SOGEI">
+            <li class="journey-stop stop-porto"><span class="journey-dot" aria-hidden="true"></span><span class="journey-name">PORTO</span></li>
+            <li class="journey-stop stop-bari"><span class="journey-dot" aria-hidden="true"></span><span class="journey-name">BARI VECCHIA</span></li>
+            <li class="journey-stop stop-direzione"><span class="journey-dot" aria-hidden="true"></span><span class="journey-name">DIREZIONE</span></li>
+            <li class="journey-stop stop-roma"><span class="journey-dot" aria-hidden="true"></span><span class="journey-name">ROMA</span><span class="journey-sub">PIAZZA MASTAI</span></li>
+            <li class="journey-stop stop-europa"><span class="journey-dot" aria-hidden="true"></span><span class="journey-name">EUROPA</span></li>
+            <li class="journey-stop stop-pescara"><span class="journey-dot" aria-hidden="true"></span><span class="journey-name">PESCARA</span><span class="journey-bonus">BONUS</span></li>
+            <li class="journey-stop stop-sogei"><span class="journey-dot" aria-hidden="true"></span><span class="journey-name">SOGEI</span><span class="journey-sub">SERVER ROOM</span></li>
+          </ol>
+        </div>
+        <div class="briefing-copy">
+          <p><strong>Ore 08:00. Molo San Nicola.</strong> Il porto è bloccato da pretendenti molesti, utenti furiosi e un polpo con problemi di gestione delle code.</p>
+          <p>Adele ha una sola direttiva: aprire un varco fino alla Basilica. A colpi di rossetto, se necessario.</p>
+        </div>
+        <div class="briefing-objectives">
+          <div><span>01</span> Dal molo alla Direzione</div>
+          <div><span>02</span> Roma, Bruxelles e i bonus di Pescara</div>
+          <div><span>03</span> Abbatti l'Ex CEO SOGEI</div>
+        </div>
+        <div class="briefing-actions">
+          <div class="controls-strip">A / D MUOVI · Z SPARA · X SALTA · C CIPRIA</div>
+          <div class="briefing-button-row">
+            <button id="btn-briefing-back" class="arcade-btn small ghost" type="button">INDIETRO</button>
+            <button id="btn-briefing" class="arcade-btn primary" type="button">APRI LA PRATICA <span>→</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LEVEL CLEAR -->
+    <section id="screen-levelclear" class="screen clear-screen" aria-labelledby="clear-title">
+      <div class="clear-card">
+        <div class="micro-label">VERBALE N. 01</div>
+        <h2 id="clear-title">MOLO LIBERATO!</h2>
+        <div class="clear-stamp">APPROVATO</div>
+        <p id="clear-copy">Il polpo ha ritirato la pratica. Il porto respira. Ma Bari Vecchia è già in rivolta.</p>
+        <div class="clear-stats">
+          <div><span>PUNTEGGIO</span><strong id="clear-score">0</strong></div>
+          <div><span>SERIE MIGLIORE</span><strong id="clear-combo">x0</strong></div>
+          <div><span>COLPI SPARATI</span><strong id="clear-shots">0</strong></div>
+        </div>
+        <button id="btn-next-level" class="arcade-btn primary" type="button">VAI A BARI VECCHIA <span>→</span></button>
+      </div>
+    </section>
+
+    <!-- GAME OVER -->
+    <section id="screen-gameover" class="screen gameover-screen" aria-labelledby="gameover-title">
+      <div class="modal-card gameover-card">
+        <div class="micro-label">UFFICIO RECLAMI · SPORTELLO CHIUSO</div>
+        <h2 id="gameover-title">PRATICA RESPINTA</h2>
+        <p class="muted-line" id="gameover-copy">Il porto ha vinto questa volta. Il rossetto chiede vendetta.</p>
+        <div class="result-grid">
+          <div><span>PUNTEGGIO</span><strong id="gameover-score">0</strong></div>
+          <div><span>RECORD</span><strong id="gameover-record">0</strong></div>
+        </div>
+        <div class="modal-actions">
+          <button id="btn-retry" class="arcade-btn primary" type="button">RIPROVA</button>
+          <button id="btn-gameover-menu" class="arcade-btn small" type="button">MENU PRINCIPALE</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VICTORY -->
+    <section id="screen-victory" class="screen victory-screen" aria-labelledby="victory-title">
+      <div class="victory-card">
+        <div class="micro-label">ATTO FINALE · DIREZIONE → ROMA → EUROPA → PESCARA → SOGEI</div>
+        <h2 id="victory-title">MISSIONE COMPLETATA!</h2>
+        <div class="victory-medal" aria-hidden="true">★</div>
+        <p>Polpo, Mecha, Mega Direttore, Giulio Cesare, Ursula e l'Ex CEO SOGEI: tutti in archivio. La pratica è <strong>APPROVATA</strong> e la filiera — Direzione Territoriale, Piazza Mastai, Bruxelles, Pescara, server room SOGEI — è finalmente in regola.</p>
+        <p class="victory-quote">«Il porto può respirare. E i cuori? Anche. Ora però mettimi in tendenza.»</p>
+        <div class="victory-bonus" role="list" aria-label="Livelli bonus completati">
+          <span class="victory-bonus-pill" role="listitem">BONUS 06 · FORMAZIONE PESCARA</span>
+          <span class="victory-bonus-pill" role="listitem">BONUS 07 · PESCARA BY NIGHT</span>
+        </div>
+        <div class="result-grid">
+          <div><span>PUNTEGGIO FINALE</span><strong id="victory-score">0</strong></div>
+          <div><span>GRADO</span><strong id="victory-rank">FUNZIONARIA</strong></div>
+          <div><span>RECORD</span><strong id="victory-record">0</strong></div>
+        </div>
+        <div class="modal-actions">
+          <button id="btn-replay" class="arcade-btn primary" type="button">NUOVA PARTITA</button>
+          <button id="btn-victory-levels" class="arcade-btn" type="button">SCEGLI LIVELLO</button>
+          <button id="btn-victory-menu" class="arcade-btn small" type="button">MENU PRINCIPALE</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- DISCLAIMER -->
+    <div id="disclaimer-modal" class="modal-layer disclaimer-layer" role="dialog" aria-modal="true" aria-labelledby="disclaimer-title" hidden>
+      <div class="modal-card disclaimer-card">
+        <div class="micro-label">AVVISO · OPERA DI FANTASIA</div>
+        <h2 id="disclaimer-title">PERSONAGGI E LUOGHI<br>DI PURA FANTASIA</h2>
+        <p><strong>DOGANA RUSH</strong> è un'opera di fantasia a scopo di intrattenimento e parodia. Personaggi, nomi, ruoli, scenari, ambientazioni, frasi, oggetti, armi, grafiche e vicende sono inventati o liberamente ispirati in chiave satirica.</p>
+        <p>Qualsiasi somiglianza con persone reali, vive o defunte, aziende, enti, istituzioni, luoghi, marchi o fatti realmente accaduti è da considerarsi <strong>puramente casuale</strong> e non intende rappresentare, offendere, diffamare o ledere alcuna persona o organizzazione.</p>
+        <p class="disclaimer-small">Il gioco non è affiliato, approvato o sponsorizzato da istituzioni, aziende o persone citate. Nessun funzionario, boss o animale marino è stato maltrattato durante lo sviluppo.</p>
+        <div class="modal-actions">
+          <button id="btn-disclaimer-ok" class="arcade-btn primary" type="button">HO CAPITO · ENTRA NEL PORTO</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GUIDE -->
+    <div id="how-modal" class="modal-layer" hidden>
+      <div class="modal-card guide-card" role="dialog" aria-modal="true" aria-labelledby="how-title">
+        <div class="modal-head"><div><div class="micro-label">MANUALE DI SERVIZIO</div><h2 id="how-title">COME SI GIOCA</h2></div><button id="btn-how-close" class="icon-btn" type="button" aria-label="Chiudi manuale">✕</button></div>
+        <div class="guide-scroll">
+        <div class="guide-columns">
+          <div>
+            <h3>CONTROLLI</h3>
+            <ul class="key-list">
+              <li><kbd>A</kbd><kbd>D</kbd><span>Muoviti (o frecce)</span></li>
+              <li><kbd>W</kbd><kbd>S</kbd><span>Mira in alto / accovacciati</span></li>
+              <li><kbd>Z</kbd> / <kbd>J</kbd><span>Spara</span></li>
+              <li><kbd>X</kbd> / <kbd>K</kbd><span>Salta</span></li>
+              <li><kbd>C</kbd> / <kbd>L</kbd><span>Cipria esplosiva</span></li>
+              <li><kbd>H</kbd><span>Cambia arma pesante</span></li>
+              <li><kbd>P</kbd> / <kbd>ESC</kbd><span>Pausa caffè</span></li>
+            </ul>
+          </div>
+          <div>
+            <h3>ARSENALE</h3>
+            <div class="guide-weapon"><span class="gear-icon lipstick-icon"></span><div><strong>ROSSETTO</strong><p>Laser fucsia ad alta cadenza. Munizioni infinite, eleganza no.</p></div></div>
+            <div class="guide-weapon"><span class="gear-icon mascara-icon"></span><div><strong>MASCARA GATLING</strong><p>Inchiostro nero rallentante. Raccogli il potenziamento, poi premi <kbd>H</kbd> per alternarlo.</p></div></div>
+            <div class="guide-weapon"><span class="gear-icon powder-icon"></span><div><strong>CIPRIA ESPLOSIVA</strong><p>Una nuvola rosa accecante. Stordisce i nemici e apre le pratiche.</p></div></div>
+          </div>
+          <div>
+            <h3>OBIETTIVO</h3>
+            <p class="guide-text">Attraversa l'Italia e l'Europa: porto, Bari Vecchia, Direzione Territoriale, Roma, Bruxelles, i bonus di Pescara e la server room SOGEI. Manda in archivio <strong>tutti i boss</strong>, fino all'Ex CEO. Distruggi casse e scrivanie per trovare energia e munizioni. La scritta <strong>AVANTI!</strong> indica la direzione della pratica.</p>
+            <div class="tip-box"><strong>CONSIGLIO DEL GIORNO</strong><p>La cipria non fa solo danni: ferma i pretendenti meglio di un due di picche.</p></div>
+          </div>
+        </div>
+        <div class="guide-extras">
+          <section class="extras-block" aria-labelledby="a11y-title">
+            <h3 id="a11y-title">ACCESSIBILITÀ</h3>
+            <div class="a11y-toggles" id="a11y-options">
+              <button class="toggle-row" type="button" data-setting="reduceFlash" aria-pressed="false"><span>RIDUCI FLASH</span><strong>OFF</strong></button>
+              <button class="toggle-row" type="button" data-setting="reduceShake" aria-pressed="false"><span>RIDUCI SCOSSONI</span><strong>OFF</strong></button>
+              <button class="toggle-row" type="button" data-setting="pauseOnBlur" aria-pressed="true"><span>PAUSA AUTOMATICA</span><strong>ON</strong></button>
+              <button class="toggle-row" type="button" data-setting="subtitles" aria-pressed="false"><span>SOTTOTITOLI</span><strong>OFF</strong></button>
+            </div>
+            <p class="extras-hint">La pausa automatica scatta quando la finestra perde il focus. Le preferenze restano salvate sul dispositivo.</p>
+            <div class="gamepad-box">
+              <h4 id="pad-title">CONTROLLER</h4>
+              <p class="extras-hint">D-PAD / STICK MUOVI · A SPARA · B SALTA · X GRANATA · Y CAMBIA ARMA · START PAUSA</p>
+              <p id="gamepad-status" class="gamepad-status" role="status" aria-live="polite">NESSUN CONTROLLER COLLEGATO</p>
+            </div>
+          </section>
+          <section class="extras-block" aria-labelledby="bindings-title">
+            <h3 id="bindings-title">RIMAPPA I TASTI</h3>
+            <div class="bindings-list" id="bindings-list" role="group" aria-label="Associazioni tasti">
+              <div class="binding-row"><span class="binding-label">MUOVI SINISTRA</span><button class="binding-key" type="button" data-action="left" data-code="KeyA" aria-label="Muovi sinistra: A. Premi per cambiare">A</button></div>
+              <div class="binding-row"><span class="binding-label">MUOVI DESTRA</span><button class="binding-key" type="button" data-action="right" data-code="KeyD" aria-label="Muovi destra: D. Premi per cambiare">D</button></div>
+              <div class="binding-row"><span class="binding-label">MIRA SU</span><button class="binding-key" type="button" data-action="up" data-code="KeyW" aria-label="Mira in alto: W. Premi per cambiare">W</button></div>
+              <div class="binding-row"><span class="binding-label">ACCOVACCIA</span><button class="binding-key" type="button" data-action="down" data-code="KeyS" aria-label="Accovacciati: S. Premi per cambiare">S</button></div>
+              <div class="binding-row"><span class="binding-label">SPARA</span><button class="binding-key" type="button" data-action="shoot" data-code="KeyZ" aria-label="Spara: Z. Premi per cambiare">Z</button></div>
+              <div class="binding-row"><span class="binding-label">SALTA</span><button class="binding-key" type="button" data-action="jump" data-code="KeyX" aria-label="Salta: X. Premi per cambiare">X</button></div>
+              <div class="binding-row"><span class="binding-label">GRANATA</span><button class="binding-key" type="button" data-action="grenade" data-code="KeyC" aria-label="Granata: C. Premi per cambiare">C</button></div>
+              <div class="binding-row"><span class="binding-label">CAMBIA ARMA</span><button class="binding-key" type="button" data-action="switch" data-code="KeyH" aria-label="Cambia arma: H. Premi per cambiare">H</button></div>
+              <div class="binding-row"><span class="binding-label">PAUSA</span><button class="binding-key" type="button" data-action="pause" data-code="KeyP" aria-label="Pausa: P. Premi per cambiare">P</button></div>
+            </div>
+            <div class="bindings-foot">
+              <button id="btn-bindings-reset" class="mini-btn" type="button">RIPRISTINA PREDEFINITI</button>
+              <span id="binding-status" class="sr-only" aria-live="polite"></span>
+            </div>
+            <p class="extras-hint">Clicca un tasto e premi il nuovo tasto. I tasti alternativi (frecce, J/K/L, Spazio) restano attivi.</p>
+          </section>
+        </div>
+        </div>
+        <div class="modal-actions"><button id="btn-how-ok" class="arcade-btn primary" type="button">HO CAPITO, TIMBRA</button></div>
+      </div>
+    </div>
+
+    <!-- PAUSE -->
+    <div id="pause-modal" class="modal-layer" hidden>
+      <div class="modal-card pause-card" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+        <div class="micro-label">PAUSA CAFFÈ · NON È UNA SCUSA</div>
+        <h2 id="pause-title">PAUSA MERITATA</h2>
+        <p>La pratica è sospesa. Il cornetto resta caldo.</p>
+        <div class="pause-toggles">
+          <span class="toggle-group-label" aria-hidden="true">AUDIO</span>
+          <button id="btn-audio-modal" class="toggle-row" type="button"><span>AUDIO</span><strong>ATTIVO</strong></button>
+          <button id="btn-voice-modal" class="toggle-row" type="button"><span>VOCE ANNUNCIATORE</span><strong>ATTIVA</strong></button>
+          <span class="toggle-group-label" aria-hidden="true">ACCESSIBILITÀ</span>
+          <button class="toggle-row" type="button" data-setting="subtitles" aria-pressed="false"><span>SOTTOTITOLI</span><strong>OFF</strong></button>
+          <button class="toggle-row" type="button" data-setting="reduceFlash" aria-pressed="false"><span>RIDUCI FLASH</span><strong>OFF</strong></button>
+          <button class="toggle-row" type="button" data-setting="reduceShake" aria-pressed="false"><span>RIDUCI SCOSSONI</span><strong>OFF</strong></button>
+          <button class="toggle-row" type="button" data-setting="pauseOnBlur" aria-pressed="true"><span>PAUSA AUTOMATICA</span><strong>ON</strong></button>
+        </div>
+        <div class="pause-guide-row">
+          <button id="btn-pause-guide" class="mini-btn" type="button">COMANDI E ACCESSIBILITÀ</button>
+        </div>
+        <div class="modal-actions">
+          <button id="btn-resume" class="arcade-btn primary" type="button">RIPRENDI</button>
+          <button id="btn-restart" class="arcade-btn small" type="button">RIAVVIA MISSIONE</button>
+          <button id="btn-pause-menu" class="arcade-btn small ghost" type="button">MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOADING -->
+    <div id="loading" class="loading-layer">
+      <div class="loading-inner">
+        <div class="loading-mark">DOGANA<br><span>RUSH</span></div>
+        <div class="loading-bar"><i></i></div>
+        <div id="loading-copy">CARICAMENTO PRATICHE...</div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <div id="subtitles" class="subtitles" hidden>
+      <span class="subtitles-tag" aria-hidden="true">VOCE</span>
+      <span id="subtitles-text"></span>
+    </div>
+
+    <!-- TOUCH CONTROLS -->
+    <div id="touch-controls" role="group" aria-label="Comandi per schermo tattile">
+      <div class="touch-dpad">
+        <button data-key="left" class="tbtn tleft" aria-label="Sinistra">&lt;</button>
+        <button data-key="up" class="tbtn tup" aria-label="Mira in alto">^</button>
+        <button data-key="down" class="tbtn tdown" aria-label="Accovacciati">v</button>
+        <button data-key="right" class="tbtn tright" aria-label="Destra">&gt;</button>
+      </div>
+      <div class="touch-actions">
+        <button data-key="switch" class="tbtn tsmall" aria-label="Cambia arma">H</button>
+        <button data-key="grenade" class="tbtn tgrenade" aria-label="Cipria esplosiva">C</button>
+        <button data-key="jump" class="tbtn tjump" aria-label="Salta">SALTA</button>
+        <button data-key="shoot" class="tbtn tshoot" aria-label="Spara">SPARA</button>
+      </div>
+      <button id="touch-pause" class="tbtn tpause" aria-label="Pausa">II</button>
+    </div>
+
+    <div id="rotate-device" aria-hidden="true"><div class="rotate-icon">↻</div><strong>RUOTA IL DISPOSITIVO</strong><span>Il porto si vive in orizzontale.</span></div>
+    <div id="aria-live" class="sr-only" aria-live="polite"></div>
+    <noscript>
+      <div class="noscript-warning">
+        <strong>JAVASCRIPT DISATTIVATO</strong>
+        <span>La Dogana ha bisogno di JavaScript per timbrare questa pratica. Attivalo e ricarica la pagina.</span>
+      </div>
+    </noscript>
+  </main>
+
+  <div id="killswitch-screen" class="killswitch-screen" hidden aria-hidden="true">
+    <div class="killswitch-panel" role="alertdialog" aria-modal="true" aria-labelledby="killswitch-title" aria-describedby="killswitch-message">
+      <p class="killswitch-kicker">DOGANA RUSH · PORTO FRANCO</p>
+      <h1 id="killswitch-title">SERVIZIO SOSPESO</h1>
+      <p id="killswitch-message">DOGANA RUSH è temporaneamente sospeso. Riprova più tardi.</p>
+      <button id="killswitch-retry" class="arcade-btn primary" type="button">RIPROVA</button>
+      <p class="killswitch-note">Il controllo avviene solo all’avvio. Se sei offline, riprova quando torni connesso.</p>
+    </div>
+  </div>
+
+  <script src="js/art.js"></script>
+  <script src="js/voices.js"></script>
+  <script src="js/sprites.js"></script>
+  <script src="js/audio.js"></script>
+  <!-- Kill switch: controllo remoto solo all'avvio; se disabilitato salva in localStorage. -->
+  <script src="js/killswitch.js"></script>
+  <script src="js/game.js"></script>
+  <!-- Aggiornamenti v1.3: configurazione canale + client (banner non bloccante). -->
+  <script src="js/update-config.js"></script>
+  <script src="js/update.js"></script>
+  <script>
+  /* DOGANA RUSH — livello UX/accessibilità (index.html)
+     Difficoltà, impostazioni accessibilità, sottotitoli, rimappatura tasti e focus trap.
+     Non modifica il motore: usa window.DOGANA quando disponibile, con fallback locale. */
+  (function () {
+    'use strict';
+    const $ = (id) => document.getElementById(id);
+    // Contratto condiviso con il motore: un'unica chiave localStorage.
+    const SETTINGS_KEY = 'dogana.settings';
+    const DIFFICULTY_ORDER = ['easy', 'normal', 'hard'];
+    const DIFFICULTY_LABELS = { easy: 'FACILE', normal: 'NORMALE', hard: 'DIFFICILE' };
+    const SETTINGS_DEFAULTS = { reduceFlash: false, reduceShake: false, pauseOnBlur: true, subtitles: false };
+    const SETTINGS_LABELS = { reduceFlash: 'Riduzione flash', reduceShake: 'Riduzione scossoni', pauseOnBlur: 'Pausa automatica', subtitles: 'Sottotitoli' };
+    const SETTING_CLASS = { reduceFlash: 'reduce-flash', reduceShake: 'reduce-shake', pauseOnBlur: 'pause-on-blur', subtitles: 'subtitles-on' };
+    const BINDING_ACTIONS = [
+      { action: 'left', label: 'MUOVI SINISTRA', def: 'KeyA' },
+      { action: 'right', label: 'MUOVI DESTRA', def: 'KeyD' },
+      { action: 'up', label: 'MIRA SU', def: 'KeyW' },
+      { action: 'down', label: 'ACCOVACCIA', def: 'KeyS' },
+      { action: 'shoot', label: 'SPARA', def: 'KeyZ' },
+      { action: 'jump', label: 'SALTA', def: 'KeyX' },
+      { action: 'grenade', label: 'GRANATA', def: 'KeyC' },
+      { action: 'switch', label: 'CAMBIA ARMA', def: 'KeyH' },
+      { action: 'pause', label: 'PAUSA', def: 'KeyP' }
+    ];
+    const KEY_NAMES = {
+      ArrowLeft: '←', ArrowRight: '→', ArrowUp: '↑', ArrowDown: '↓',
+      Space: 'SPAZIO', Escape: 'ESC', Enter: 'INVIO', Tab: 'TAB', Backspace: 'BACKSPACE',
+      ShiftLeft: 'MAIUSC SX', ShiftRight: 'MAIUSC DX',
+      ControlLeft: 'CTRL SX', ControlRight: 'CTRL DX',
+      AltLeft: 'ALT SX', AltRight: 'ALT DX'
+    };
+    const MODIFIER_CODES = ['ShiftLeft', 'ShiftRight', 'ControlLeft', 'ControlRight', 'AltLeft', 'AltRight', 'MetaLeft', 'MetaRight'];
+
+    function safeGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+    function safeSet(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
+    function liveSay(msg) { const el = $('aria-live'); if (el) el.textContent = msg; }
+
+    /* ---------------- impostazioni accessibilità ---------------- */
+    const settings = Object.assign({}, SETTINGS_DEFAULTS);
+    let storedDifficulty = null;
+    let storedBindings = null;
+    let settingsSaved = false;
+    try {
+      const raw = safeGet(SETTINGS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) || {};
+        settingsSaved = true;
+        Object.keys(SETTINGS_DEFAULTS).forEach(k => {
+          if (typeof parsed[k] === 'boolean') settings[k] = parsed[k];
+        });
+        if (DIFFICULTY_ORDER.indexOf(parsed.difficulty) !== -1) storedDifficulty = parsed.difficulty;
+        if (parsed.bindings && typeof parsed.bindings === 'object') storedBindings = parsed.bindings;
+      }
+    } catch (e) { /* storage non disponibile */ }
+    const prefersReducedMotion = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    if (!settingsSaved && prefersReducedMotion) { settings.reduceFlash = true; settings.reduceShake = true; }
+    // Snapshot completo scritto dal nostro livello UI e letto dal motore al boot.
+    function settingsSnapshot() {
+      return {
+        difficulty: currentDifficulty,
+        reduceFlash: !!settings.reduceFlash,
+        reduceShake: !!settings.reduceShake,
+        pauseOnBlur: !!settings.pauseOnBlur,
+        subtitles: !!settings.subtitles,
+        bindings: Object.assign({}, bindings)
+      };
+    }
+    function saveSettings() {
+      const snapshot = settingsSnapshot();
+      safeSet(SETTINGS_KEY, JSON.stringify(snapshot));
+      document.dispatchEvent(new CustomEvent('dogana:settings', { detail: snapshot }));
+    }
+    function syncSettingButtons(key) {
+      Array.prototype.forEach.call(document.querySelectorAll('[data-setting="' + key + '"]'), (btn) => {
+        btn.setAttribute('aria-pressed', settings[key] ? 'true' : 'false');
+        btn.classList.toggle('off', !settings[key]);
+        const strong = btn.querySelector('strong');
+        if (strong) strong.textContent = settings[key] ? 'ON' : 'OFF';
+      });
+    }
+    function applySettingDom(key) {
+      if (SETTING_CLASS[key]) document.body.classList.toggle(SETTING_CLASS[key], !!settings[key]);
+      syncSettingButtons(key);
+    }
+    function pushSettingToGame(key) {
+      try {
+        if (window.DOGANA && typeof window.DOGANA.setSetting === 'function') window.DOGANA.setSetting(key, settings[key]);
+      } catch (e) { /* API non pronta */ }
+    }
+    function setSetting(key, value) {
+      if (!(key in SETTINGS_DEFAULTS)) return;
+      settings[key] = !!value;
+      applySettingDom(key);
+      saveSettings();
+      pushSettingToGame(key);
+      if (key === 'subtitles' && !settings[key]) hideSubtitle();
+      liveSay(SETTINGS_LABELS[key] + (settings[key] ? ' attivata.' : ' disattivata.'));
+    }
+    function syncAllSettingsToGame() {
+      try {
+        if (!window.DOGANA || typeof window.DOGANA.setSetting !== 'function') return false;
+        Object.keys(settings).forEach(k => window.DOGANA.setSetting(k, settings[k]));
+        return true;
+      } catch (e) { return false; }
+    }    Object.keys(settings).forEach(applySettingDom);
+    document.addEventListener('click', (e) => {
+      const btn = e.target && e.target.closest ? e.target.closest('[data-setting]') : null;
+      if (!btn) return;
+      const key = btn.getAttribute('data-setting');
+      if (key in SETTINGS_DEFAULTS) setSetting(key, !settings[key]);
+    });
+
+    /* ---------------- sottotitoli (separati dall'audio) ----------------
+       Il playback e l'emissione dei testi sono di audio.js/content-art:
+       qui ascoltiamo solo l'evento `dogana:subtitle` e mostriamo #subtitles. */
+    const subtitleEl = $('subtitles');
+    const subtitleText = $('subtitles-text');
+    let subtitleTimer = null;
+    function hideSubtitle() {
+      if (subtitleTimer) { clearTimeout(subtitleTimer); subtitleTimer = null; }
+      if (subtitleEl) subtitleEl.hidden = true;
+    }
+    function showSubtitle(text, duration) {
+      if (!settings.subtitles || !text || !subtitleEl || !subtitleText) return;
+      const clean = String(text).replace(/\s+/g, ' ').trim();
+      if (!clean) return;
+      subtitleText.textContent = clean;
+      subtitleEl.hidden = false;
+      const ms = duration || Math.min(7000, Math.max(1700, clean.length * 85 + 1200));
+      if (subtitleTimer) clearTimeout(subtitleTimer);
+      subtitleTimer = setTimeout(() => { subtitleEl.hidden = true; subtitleTimer = null; }, ms);
+    }
+    document.addEventListener('dogana:subtitle', (e) => {
+      const detail = e.detail || {};
+      showSubtitle(detail.text || detail.line, detail.duration);
+    });
+
+    /* ---------------- difficoltà: stato visivo + bridge per gameplay ---------------- */
+    const difficultyGroup = $('difficulty-group');
+    let currentDifficulty = 'normal';
+    function difficultyLabel(value) { return DIFFICULTY_LABELS[value] || 'NORMALE'; }
+    function syncDifficultyFlavor() {
+      const pill = $('briefing-difficulty-value');
+      if (pill) pill.textContent = difficultyLabel(currentDifficulty);
+      if (difficultyGroup) difficultyGroup.setAttribute('data-value', currentDifficulty);
+    }
+    function setDifficulty(value, opts) {
+      if (DIFFICULTY_ORDER.indexOf(value) === -1) return;
+      currentDifficulty = value;
+      if (difficultyGroup) {
+        difficultyGroup.setAttribute('data-value', value);
+        Array.prototype.forEach.call(difficultyGroup.querySelectorAll('.difficulty-btn'), (btn) => {
+          const selected = btn.getAttribute('data-difficulty') === value;
+          btn.classList.toggle('is-selected', selected);
+          btn.setAttribute('aria-pressed', selected ? 'true' : 'false');
+        });
+      }
+      syncDifficultyFlavor();
+      if (!opts || !opts.silent) {
+        saveSettings();
+        try { if (window.DOGANA && typeof window.DOGANA.setDifficulty === 'function') window.DOGANA.setDifficulty(value); } catch (e) {}
+        liveSay('Difficoltà impostata su ' + difficultyLabel(value) + '.');
+      }
+    }
+    if (difficultyGroup) {
+      difficultyGroup.addEventListener('click', (e) => {
+        const btn = e.target && e.target.closest ? e.target.closest('.difficulty-btn') : null;
+        if (btn) setDifficulty(btn.getAttribute('data-difficulty'));
+      });
+      difficultyGroup.addEventListener('keydown', (e) => {
+        const step = e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : (e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : 0);
+        if (!step) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const index = DIFFICULTY_ORDER.indexOf(currentDifficulty);
+        const next = DIFFICULTY_ORDER[(index + step + DIFFICULTY_ORDER.length) % DIFFICULTY_ORDER.length];
+        setDifficulty(next);
+        const btn = difficultyGroup.querySelector('[data-difficulty="' + next + '"]');
+        if (btn) btn.focus();
+      });
+      // Se il motore aggiorna le classi, la pillola del briefing resta allineata.
+      new MutationObserver(() => {
+        const selected = difficultyGroup.querySelector('.difficulty-btn.is-selected');
+        const value = selected && selected.getAttribute('data-difficulty');
+        if (value && value !== currentDifficulty) { currentDifficulty = value; syncDifficultyFlavor(); }
+        Array.prototype.forEach.call(difficultyGroup.querySelectorAll('.difficulty-btn'), (btn) => {
+          const on = btn.classList.contains('is-selected');
+          if (btn.getAttribute('aria-pressed') !== (on ? 'true' : 'false')) btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+      }).observe(difficultyGroup, { attributes: true, subtree: true, attributeFilter: ['class'] });
+    }
+    // Ripristina la difficoltà salvata (il motore legge la stessa chiave al boot).
+    if (storedDifficulty) setDifficulty(storedDifficulty, { silent: true });
+    syncDifficultyFlavor();
+
+    /* ---------------- pausa automatica alla perdita di focus ---------------- */
+    window.addEventListener('blur', () => {
+      if (!settings.pauseOnBlur) return;
+      const state = window.DOGANA && window.DOGANA.state;
+      if (!state || state.mode !== 'playing') return;
+      const pauseBtn = $('touch-pause');
+      if (pauseBtn) pauseBtn.click();
+    });
+
+    /* ---------------- rimappatura tasti ---------------- */
+    const bindings = {};
+    BINDING_ACTIONS.forEach((entry) => { bindings[entry.action] = entry.def; });
+    if (storedBindings) {
+      BINDING_ACTIONS.forEach((entry) => {
+        const code = storedBindings[entry.action];
+        if (typeof code === 'string' && code) bindings[entry.action] = code;
+      });
+    }
+    let listeningAction = null;
+    function keyLabel(code) {
+      if (!code) return '—';
+      if (KEY_NAMES[code]) return KEY_NAMES[code];
+      if (/^Key[A-Z]$/.test(code)) return code.slice(3);
+      if (/^Digit[0-9]$/.test(code)) return code.slice(5);
+      if (/^F[0-9]{1,2}$/.test(code)) return code;
+      if (/^Numpad/.test(code)) return code.slice(6).toUpperCase();
+      return code.replace(/^Arrow/, '').slice(0, 10).toUpperCase();
+    }
+    function actionLabel(action) {
+      const entry = BINDING_ACTIONS.filter((item) => item.action === action)[0];
+      return entry ? entry.label : action;
+    }
+    function bindingButtons() {
+      return Array.prototype.slice.call(document.querySelectorAll('.binding-key'));
+    }
+    function renderBindings() {
+      bindingButtons().forEach((btn) => {
+        const action = btn.getAttribute('data-action');
+        const code = bindings[action];
+        const listening = listeningAction === action;
+        btn.textContent = listening ? 'PREMI...' : keyLabel(code);
+        btn.classList.toggle('is-listening', listening);
+        btn.setAttribute('data-code', code || '');
+        btn.setAttribute('aria-label', actionLabel(action) + ': ' + keyLabel(code) + '. Premi per cambiare');
+      });
+    }
+    function announceBinding(msg) {
+      const status = $('binding-status');
+      if (status) status.textContent = msg;
+    }
+    function saveBindings() {
+      // Scrive la chiave unica dogana.settings ed emette dogana:settings.
+      saveSettings();
+      try {
+        if (window.DOGANA && typeof window.DOGANA.setBinding === 'function') {
+          BINDING_ACTIONS.forEach((entry) => window.DOGANA.setBinding(entry.action, bindings[entry.action]));
+        }
+      } catch (e) { /* API non pronta */ }
+    }
+    function applyBinding(action, code) {
+      if (!action || !code) return;
+      const previous = bindings[action];
+      const conflict = BINDING_ACTIONS.filter((entry) => entry.action !== action && bindings[entry.action] === code)[0];
+      bindings[action] = code;
+      let message;
+      if (conflict) {
+        bindings[conflict.action] = previous;
+        message = 'Tasto ' + keyLabel(code) + ' assegnato a ' + actionLabel(action) + '. ' + actionLabel(conflict.action) + ' ora usa ' + keyLabel(previous) + '.';
+      } else {
+        message = 'Tasto ' + keyLabel(code) + ' assegnato a ' + actionLabel(action) + '.';
+      }
+      saveBindings();
+      renderBindings();
+      announceBinding(message);
+      liveSay(message);
+    }
+    document.addEventListener('click', (e) => {
+      const btn = e.target && e.target.closest ? e.target.closest('.binding-key') : null;
+      if (!btn) return;
+      const action = btn.getAttribute('data-action');
+      if (listeningAction === action) { listeningAction = null; renderBindings(); return; }
+      listeningAction = action;
+      renderBindings();
+      announceBinding('In attesa del nuovo tasto per ' + actionLabel(action) + '. Premi ESC per annullare.');
+      liveSay('In attesa del nuovo tasto per ' + actionLabel(action) + '.');
+    });
+    document.addEventListener('keydown', (e) => {
+      if (!listeningAction) return;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        announceBinding('Rimappatura annullata.');
+        listeningAction = null;
+        renderBindings();
+        return;
+      }
+      if (MODIFIER_CODES.indexOf(e.code) !== -1) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      const action = listeningAction;
+      listeningAction = null;
+      applyBinding(action, e.code);
+    }, true);
+    const resetBindingsBtn = $('btn-bindings-reset');
+    if (resetBindingsBtn) {
+      resetBindingsBtn.addEventListener('click', () => {
+        BINDING_ACTIONS.forEach((entry) => { bindings[entry.action] = entry.def; });
+        saveBindings();
+        renderBindings();
+        announceBinding('Tasti predefiniti ripristinati.');
+        liveSay('Tasti predefiniti ripristinati.');
+      });
+    }
+    renderBindings();
+    function syncBindingsFromGame() {
+      const api = window.DOGANA;
+      if (!api || !api.inputBindings) return false;
+      let changed = false;
+      BINDING_ACTIONS.forEach((entry) => {
+        const code = api.inputBindings[entry.action];
+        if (typeof code === 'string' && code && bindings[entry.action] !== code) { bindings[entry.action] = code; changed = true; }
+      });
+      if (changed) renderBindings();
+      return true;
+    }
+
+    /* ---------------- controller ---------------- */
+    function updateGamepadStatus() {
+      const el = $('gamepad-status');
+      if (!el) return;
+      let pads = [];
+      try { pads = navigator.getGamepads ? Array.prototype.filter.call(navigator.getGamepads(), (pad) => !!pad) : []; } catch (e) {}
+      if (pads.length) {
+        const name = String(pads[0].id || 'GAMEPAD').replace(/\s*\(.*$/, '').slice(0, 42).toUpperCase();
+        el.textContent = 'CONTROLLER COLLEGATO: ' + name;
+        el.classList.add('connected');
+      } else {
+        el.textContent = 'NESSUN CONTROLLER COLLEGATO';
+        el.classList.remove('connected');
+      }
+    }
+    window.addEventListener('gamepadconnected', updateGamepadStatus);
+    window.addEventListener('gamepaddisconnected', updateGamepadStatus);
+    updateGamepadStatus();
+
+    /* ---------------- roster: aria-pressed coerente con la selezione ----------------
+       Il motore aggiorna solo .is-selected: qui allineiamo aria-pressed per screen reader. */
+    function syncRosterAria() {
+      Array.prototype.forEach.call(document.querySelectorAll('.fighter-card'), (card) => {
+        const pressed = card.classList.contains('is-selected') ? 'true' : 'false';
+        if (card.getAttribute('aria-pressed') !== pressed) card.setAttribute('aria-pressed', pressed);
+      });
+    }
+    syncRosterAria();
+    const rosterEl = document.querySelector('.roster');
+    if (rosterEl) {
+      new MutationObserver(syncRosterAria).observe(rosterEl, { attributes: true, subtree: true, attributeFilter: ['class'] });
+    }
+
+    /* ---------------- focus trap modali + ripristino focus ---------------- */
+    function visibleModal() {
+      const how = $('how-modal');
+      if (how && !how.hidden) return how;
+      const pause = $('pause-modal');
+      if (pause && !pause.hidden) return pause;
+      return null;
+    }
+    // Class di stato per spostare i sottotitoli sotto la card quando una modale è aperta.
+    function updateModalOpenClass() {
+      const how = $('how-modal');
+      const pause = $('pause-modal');
+      const any = (how && !how.hidden) || (pause && !pause.hidden);
+      document.body.classList.toggle('modal-open', !!any);
+    }
+    ['how-modal', 'pause-modal'].forEach((id) => {
+      const modal = $(id);
+      if (modal) new MutationObserver(updateModalOpenClass).observe(modal, { attributes: true, attributeFilter: ['hidden'] });
+    });
+    updateModalOpenClass();
+    function focusableIn(root) {
+      return Array.prototype.filter.call(
+        root.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'),
+        (el) => !el.disabled && el.offsetWidth > 0 && el.offsetHeight > 0
+      );
+    }
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab') return;
+      const modal = visibleModal();
+      if (!modal) return;
+      const list = focusableIn(modal);
+      if (!list.length) return;
+      const first = list[0];
+      const last = list[list.length - 1];
+      const active = document.activeElement;
+      if (!modal.contains(active)) { e.preventDefault(); first.focus(); return; }
+      if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
+    }, true);
+    let lastGuideTrigger = null;
+    document.addEventListener('click', (e) => {
+      const trigger = e.target && e.target.closest ? e.target.closest('#btn-how, #btn-pause-guide') : null;
+      if (trigger) lastGuideTrigger = trigger;
+    }, true);
+    const pauseGuideBtn = $('btn-pause-guide');
+    if (pauseGuideBtn) {
+      pauseGuideBtn.addEventListener('click', () => {
+        const how = $('how-modal');
+        if (!how) return;
+        lastGuideTrigger = pauseGuideBtn;
+        how.hidden = false;
+        const firstToggle = how.querySelector('.toggle-row');
+        if (firstToggle) firstToggle.focus();
+      });
+    }
+    const howModal = $('how-modal');
+    if (howModal) {
+      new MutationObserver(() => {
+        if (!howModal.hidden) return;
+        const trigger = lastGuideTrigger;
+        lastGuideTrigger = null;
+        if (trigger && document.contains(trigger) && trigger.offsetParent !== null) {
+          setTimeout(() => { try { trigger.focus(); } catch (e) {} }, 0);
+        }
+      }).observe(howModal, { attributes: true, attributeFilter: ['hidden'] });
+    }
+
+    /* ---------------- orientamento ---------------- */
+    function updateOrientation() {
+      const el = $('rotate-device');
+      if (!el) return;
+      const portrait = !!(window.matchMedia && matchMedia('(orientation: portrait)').matches) && window.innerWidth <= 1000;
+      el.setAttribute('aria-hidden', portrait ? 'false' : 'true');
+      el.setAttribute('role', portrait ? 'status' : 'presentation');
+    }
+    window.addEventListener('resize', updateOrientation);
+    if (window.matchMedia) {
+      try { matchMedia('(orientation: portrait)').addEventListener('change', updateOrientation); } catch (e) {}
+    }
+    updateOrientation();
+
+    /* ---------------- bridge DOGANA: applica impostazioni/tasti appena pronta ----------------
+       Il motore legge dogana.settings al boot; qui riapplichiamo via API appena DOGANA esiste
+       e ascoltiamo `dogana:ready` (l'evento che segnala l'API pronta). */
+    let bridgeTimer = null;
+    let bridgeAttempts = 0;
+    let bridgePushed = false;
+    function syncBridge() {
+      const api = window.DOGANA;
+      if (!api) return false;
+      const hasSettingsApi = typeof api.setSetting === 'function';
+      const hasDifficultyApi = typeof api.setDifficulty === 'function';
+      const hasBindingApi = typeof api.setBinding === 'function';
+      if (!bridgePushed && (hasSettingsApi || hasDifficultyApi || hasBindingApi)) {
+        if (hasSettingsApi) Object.keys(settings).forEach((key) => api.setSetting(key, settings[key]));
+        if (hasDifficultyApi) api.setDifficulty(currentDifficulty);
+        if (hasBindingApi) BINDING_ACTIONS.forEach((entry) => api.setBinding(entry.action, bindings[entry.action]));
+        bridgePushed = true;
+      }
+      if (api.inputBindings) syncBindingsFromGame();
+      return hasSettingsApi || hasDifficultyApi || hasBindingApi;
+    }
+    if (!syncBridge()) {
+      bridgeTimer = setInterval(() => {
+        bridgeAttempts++;
+        if (syncBridge() || bridgeAttempts >= 20) { clearInterval(bridgeTimer); bridgeTimer = null; }
+      }, 250);
+    }
+    document.addEventListener('dogana:ready', () => {
+      bridgePushed = false;
+      syncBridge();
+    });
+  })();
+  </script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    }
+  </script>
+</body>
+</html>

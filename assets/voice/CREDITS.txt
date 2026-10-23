@@ -1,0 +1,5 @@
+Voci di DOGANA RUSH generate con Cartesia Sonic.
+Voci italiane: Franco (annunciatore, nemici, colleghi), Elena (Adele), Fabio (Rocco), Alessio (Mega Direttore).
+Modello: sonic-3.6
+91 clip MP3: annunciatore, personaggi giocabili, boss, nemici, colleghi e battute contestuali.
+Nessuna chiave API o credenziale è inclusa nel progetto.

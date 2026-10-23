@@ -1,0 +1,20 @@
+{
+  "version": "2.5.0",
+  "tag": "v2.5.0",
+  "released": "2026-10-23",
+  "publishedAt": "2026-10-23T14:53:03.793Z",
+  "releaseUrl": "https://github.com/gstorelli/dogana-rush-updates/releases/tag/v2.5.0",
+  "notes": "v2.5.0: kill switch di emergenza con blocco persistente offline",
+  "web": {
+    "url": "https://github.com/gstorelli/dogana-rush-updates/releases/latest/download/DOGANA_RUSH_WEB_2.5.0.zip",
+    "size": 16203431,
+    "sha256": "418f102c3d04637720b7a538a0b5633135f1e3600a3d3cd6f7c71151187905b8"
+  },
+  "android": {
+    "versionCode": 20500,
+    "versionName": "2.5.0",
+    "url": "https://github.com/gstorelli/dogana-rush-updates/releases/latest/download/DOGANA_RUSH_ANDROID_2.5.0-debug.apk",
+    "sha256": "c7dd20f0e1ecf0e98ae0d71865ef463cd465f040bb94570d8065dbd5862a2163",
+    "size": 23419747
+  }
+}

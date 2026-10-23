@@ -1,0 +1,11 @@
+Voci v2.0 di DOGANA RUSH — 68 clip MP3 generate con AI.
+- Modello principale: Fish Audio Drama 3 (via OpenRouter, clonazione stateless con reference).
+- Reference per il cloning: clip Cartesia v1 del progetto (Adele/Elena, Rocco/Fabio,
+  Annunciatore/Franco, Mega Direttore/Alessio) e clip Deepgram Aura-2 per i personaggi nuovi
+  (tedesco: aurelia-de/elara-de; francese: hector-fr; italiano: cesare/dionisio/elio/flavio/
+  maia/melia-it).
+- Lingue: italiano (58 clip), tedesco (8, Ursula/Merkel — sottotitoli italiani),
+  francese (2, nemici francesi — sottotitoli italiani).
+- Postprocess: trim silenzio, -17.6 LUFS, 44.1 kHz mono, MP3 96 kbps (allineato alle clip v1).
+- Pipeline riproducibile: tools/voice-gen/ (catalogo lines.mjs, generate.mjs, apply-manifest.mjs).
+Nessuna chiave API o credenziale è inclusa nel progetto.
